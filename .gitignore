@@ -1,2 +1,11 @@
+# Ignore all .env files
+*.env
+
+# Ignore node_modules directory
 node_modules/
+
+# Ignore .DS_Store files (common in macOS)
 .DS_Store
+
+# Ignore SSL certificates directory
+ssl/

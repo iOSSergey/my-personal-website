@@ -1,0 +1,33 @@
+services:
+  web:
+    build: .
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static_volume:/app/staticfiles
+    networks:
+      - webnet
+  
+  cms:
+    image: iossergey/client_management_system:latest
+    container_name: cms
+    env_file:
+      - ./client_management_system.env
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    command: >
+      /bin/sh -c "python manage.py collectstatic --noinput &&
+                  python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    networks:
+      - webnet
+
+networks:
+  webnet:
+
+volumes:
+  static_volume:
+  media_volume:
