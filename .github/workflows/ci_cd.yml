@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     name: Deploy to Server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       # Checkout the repository
@@ -28,5 +28,53 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
         run: |
           rsync -avz --delete \
+            --exclude='.git' --exclude='.git/*' \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ $USERNAME@$SERVER:~/dev/my-personal-website
+
+      # Create .env file on the server
+      - name: Create .env file
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+          DEBUG: ${{ secrets.DEBUG }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          cat <<EOT > ~/dev/my-personal-website/client_management_system.env
+          DEBUG=${DEBUG}
+          SECRET_KEY=${SECRET_KEY}
+          DATABASE_NAME=${DATABASE_NAME}
+          DATABASE_USER=${DATABASE_USER}
+          DATABASE_PASSWORD=${DATABASE_PASSWORD}
+          DATABASE_HOST=${DATABASE_HOST}
+          DATABASE_PORT=${DATABASE_PORT}
+          EOT
+          EOF
+
+      # Stop Nginx and Gunicorn
+      - name: Stop Nginx and Gunicorn
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          sudo systemctl stop nginx
+          sudo systemctl stop gunicorn
+          EOF
+
+      # Update and restart Docker Compose
+      - name: Update and Restart Docker Compose
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          cd ~/dev/my-personal-website
+          docker compose up --build -d
+          EOF
