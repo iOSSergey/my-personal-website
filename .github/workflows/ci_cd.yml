@@ -65,16 +65,16 @@ jobs:
           EOT
           EOF
 
-      # Create symbolic links for SSL certificates
-      - name: Create symbolic links for SSL certificates
+      # Copy SSL certificates
+      - name: Copy SSL certificates
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           mkdir -p ~/dev/my-personal-website/ssl
-          ln -sf /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/fullchain.pem
-          ln -sf /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/privkey.pem
+          cp /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/fullchain.pem
+          cp /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/privkey.pem
           EOF
 
       # Stop Nginx and Gunicorn
@@ -97,5 +97,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           cd ~/dev/my-personal-website
           docker compose up --build -d
-          sudo systemctl restart nginx
           EOF
