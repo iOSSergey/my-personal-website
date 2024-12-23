@@ -96,5 +96,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           cd ~/dev/my-personal-website
+          docker compose pull
           docker compose up --build -d
           EOF
