@@ -12,6 +12,3 @@ COPY about-me.html /usr/share/nginx/html/about-me.html
 
 # Copy the profile.jpg file into the Nginx html-static directory
 COPY profile.jpg /usr/share/nginx/html/html-static/profile.jpg
-
-# Copy SSL certificates into the Nginx directory
-COPY ssl /etc/nginx/ssl

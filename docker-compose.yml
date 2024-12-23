@@ -7,6 +7,7 @@ services:
       - "443:443"
     volumes:
       - static_volume:/app/staticfiles
+      - ./ssl:/etc/nginx/ssl
     networks:
       - webnet
   
