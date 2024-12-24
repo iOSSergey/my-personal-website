@@ -10,6 +10,7 @@ services:
       - ./ssl:/etc/nginx/ssl
     networks:
       - webnet
+    restart: always
   
   cms:
     image: iossergey/client_management_system:latest
