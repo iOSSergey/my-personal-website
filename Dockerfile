@@ -7,8 +7,11 @@ RUN mkdir -p /usr/share/nginx/html/html-static /app/staticfiles
 # Copy custom configuration file from the current directory
 COPY nginx.conf /etc/nginx/nginx.conf
 
+# Expose the ports for Nginx
+EXPOSE 80 443
+
 # Copy the HTML file into the Nginx html directory
-COPY about-me.html /usr/share/nginx/html/about-me.html
+# COPY about-me.html /usr/share/nginx/html/about-me.html
 
 # Copy the profile.jpg file into the Nginx html-static directory
-COPY profile.jpg /usr/share/nginx/html/html-static/profile.jpg
+# COPY profile.jpg /usr/share/nginx/html/html-static/profile.jpg
