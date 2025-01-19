@@ -21,6 +21,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # Create directory on server
+      - name: Create directory on server
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER 'mkdir -p ~/staging/my-personal-website'
+
       # Copy files to server
       - name: Deploy to Server
         env:
@@ -73,10 +81,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           mkdir -p ~/staging/my-personal-website/ssl
-
-          # TODO: Change the domain name
-          # cp /etc/letsencrypt/live/staging.pavlyuk.online/fullchain.pem ~/staging/my-personal-website/ssl/fullchain.pem
-          # cp /etc/letsencrypt/live/staging.pavlyuk.online/privkey.pem ~/staging/my-personal-website/ssl/privkey.pem
+          #
+          # TODO make certificates for staging.pavlyuk.online available on the server
           cp /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/staging/my-personal-website/ssl/fullchain.pem
           cp /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/staging/my-personal-website/ssl/privkey.pem
           EOF
