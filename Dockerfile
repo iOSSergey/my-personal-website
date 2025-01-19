@@ -1,6 +1,10 @@
 # Use the official Nginx image from the Docker Hub
 FROM nginx:latest
 
+# Install nano text editor
+RUN apt-get update && apt-get install -y nano && \
+  alias ll='ls -alF'
+
 # Create necessary directories
 RUN mkdir -p /usr/share/nginx/html/html-static /app/staticfiles
 
