@@ -14,7 +14,7 @@ services:
       - webnet
     restart: always
   
-  web-staging:
+  nginx-staging:
     build: .
     container_name: nginx-staging
     ports:
