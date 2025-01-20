@@ -108,6 +108,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           cd ~/staging/my-personal-website
-          docker compose pull
-          docker compose up --build -d
+          docker compose pull nginx-staging
+          docker compose up --build -d nginx-staging
           EOF
