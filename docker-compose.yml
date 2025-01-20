@@ -1,7 +1,7 @@
 services:
-  web:
+  web-production:
     build: .
-    container_name: nginx
+    container_name: nginx-production
     ports:
       - "80:80"
       - "443:443"
@@ -10,6 +10,21 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
       - ./html:/usr/share/nginx/html/
+    networks:
+      - webnet
+    restart: always
+  
+  web-staging:
+    build: .
+    container_name: nginx-staging
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - static_volume_staging:/app/staticfiles
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./html:/var/www/staging/html/
     networks:
       - webnet
     restart: always
@@ -34,4 +49,5 @@ networks:
 
 volumes:
   static_volume:
+  static_volume_staging:
   media_volume:

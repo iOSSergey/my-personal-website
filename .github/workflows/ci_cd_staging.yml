@@ -88,24 +88,24 @@ jobs:
           EOF
 
       # Stop Nginx and Gunicorn
-      # - name: Stop Nginx and Gunicorn
-      #   env:
-      #     USERNAME: ${{ secrets.USERNAME }}
-      #     SERVER: ${{ secrets.SERVER }}
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-      #     sudo systemctl stop nginx
-      #     sudo systemctl stop gunicorn
-      #     EOF
+      - name: Stop Nginx and Gunicorn
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          sudo systemctl stop nginx
+          sudo systemctl stop gunicorn
+          EOF
 
       # Update and restart Docker Compose
-      # - name: Update and Restart Docker Compose
-      #   env:
-      #     USERNAME: ${{ secrets.USERNAME }}
-      #     SERVER: ${{ secrets.SERVER }}
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-      #     cd ~/staging/my-personal-website
-      #     docker compose pull
-      #     docker compose up --build -d
-      #     EOF
+      - name: Update and Restart Docker Compose
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          cd ~/staging/my-personal-website
+          docker compose pull
+          docker compose up --build -d
+          EOF
