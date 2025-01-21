@@ -75,8 +75,8 @@ jobs:
           mkdir -p ~/dev/my-personal-website/ssl
           cp /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/fullchain.pem
           cp /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/privkey.pem
-          cp /etc/letsencrypt/live/staging.pavlyuk.online/fullchain.pem ~/staging/my-personal-website/ssl/staging_fullchain.pem
-          cp /etc/letsencrypt/live/staging.pavlyuk.online/privkey.pem ~/staging/my-personal-website/ssl/staging_privkey.pem
+          cp /etc/letsencrypt/live/staging.pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/staging_fullchain.pem
+          cp /etc/letsencrypt/live/staging.pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/staging_privkey.pem
           EOF
 
       # Stop Nginx and Gunicorn
