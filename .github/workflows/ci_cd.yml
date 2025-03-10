@@ -112,7 +112,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10 $USERNAME@$SERVER << 'EOF'
           cd ~/dev/my-personal-website
           docker compose pull
           docker compose up --build -d
