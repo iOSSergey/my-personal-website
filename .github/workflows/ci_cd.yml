@@ -66,29 +66,29 @@ jobs:
           EOF
 
       # Copy SSL certificates
-      - name: Copy SSL certificates
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          SERVER: ${{ secrets.SERVER }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          mkdir -p ~/dev/my-personal-website/ssl
-          cp /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/fullchain.pem
-          cp /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/privkey.pem
-          cp /etc/letsencrypt/live/staging.pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/staging_fullchain.pem
-          cp /etc/letsencrypt/live/staging.pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/staging_privkey.pem
-          EOF
+      # - name: Copy SSL certificates
+      #   env:
+      #     USERNAME: ${{ secrets.USERNAME }}
+      #     SERVER: ${{ secrets.SERVER }}
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+      #     mkdir -p ~/dev/my-personal-website/ssl
+      #     cp /etc/letsencrypt/live/pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/fullchain.pem
+      #     cp /etc/letsencrypt/live/pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/privkey.pem
+      #     cp /etc/letsencrypt/live/staging.pavlyuk.online/fullchain.pem ~/dev/my-personal-website/ssl/staging_fullchain.pem
+      #     cp /etc/letsencrypt/live/staging.pavlyuk.online/privkey.pem ~/dev/my-personal-website/ssl/staging_privkey.pem
+      #     EOF
 
       # Stop Nginx and Gunicorn
-      - name: Stop Nginx and Gunicorn
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          SERVER: ${{ secrets.SERVER }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          sudo systemctl stop nginx
-          sudo systemctl stop gunicorn
-          EOF
+      # - name: Stop Nginx and Gunicorn
+      #   env:
+      #     USERNAME: ${{ secrets.USERNAME }}
+      #     SERVER: ${{ secrets.SERVER }}
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+      #     sudo systemctl stop nginx
+      #     sudo systemctl stop gunicorn
+      #     EOF
 
       # Update and restart Docker Compose
       - name: Update and Restart Docker Compose
