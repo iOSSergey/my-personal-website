@@ -21,6 +21,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # Install rsync on the server
+      - name: Install rsync on Server
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "sudo apt update && sudo apt install -y rsync"
+
       # Copy files to server
       - name: Deploy to Server
         env:
