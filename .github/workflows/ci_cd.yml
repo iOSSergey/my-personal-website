@@ -21,6 +21,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # Ensure the target directory exists
+      - name: Ensure target directory exists
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p ~/dev/my-personal-website"
+
       # Install rsync on the server
       - name: Install rsync on Server
         env:
