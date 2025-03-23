@@ -13,9 +13,11 @@ services:
     networks:
       - webnet
     restart: always
-  
+
   cms:
     image: iossergey/client_management_system:latest
+    mem_limit: 100m
+    memswap_limit: 150m
     container_name: cms
     env_file:
       - ./client_management_system.env
@@ -31,6 +33,7 @@ services:
 
 networks:
   webnet:
+
 
 volumes:
   static_volume:
