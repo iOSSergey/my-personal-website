@@ -93,15 +93,26 @@ jobs:
             echo "${{ secrets.SSL_CERTIFICATE_KEY }}" > ~/dev/my-personal-website/ssl/privkey.pem
           EOF
 
-      # Stop Nginx and Gunicorn
+      # Stop Nginx and Gunicorn if they are running
       - name: Stop Nginx and Gunicorn
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          sudo systemctl stop nginx
-          sudo systemctl stop gunicorn
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} << 'EOF'
+          if systemctl is-active --quiet nginx
+          then
+              sudo systemctl stop nginx
+          else
+              echo "Nginx is not running"
+          fi
+
+          if systemctl is-active --quiet gunicorn
+          then
+              sudo systemctl stop gunicorn
+          else
+              echo "Gunicorn is not running"
+          fi
           EOF
 
       # Update and restart Docker Compose
