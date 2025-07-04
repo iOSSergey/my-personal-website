@@ -7,5 +7,9 @@ node_modules/
 # Ignore .DS_Store files (common in macOS)
 .DS_Store
 
-# Ignore SSL certificates directory
+# Ignore SSL certificates and Let's Encrypt data
 ssl/
+certbot/
+
+# Ignore log files
+*.log
