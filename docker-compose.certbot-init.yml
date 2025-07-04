@@ -1,0 +1,13 @@
+# Docker Compose override for initial certificate generation
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.certbot-init.yml up certbot
+
+services:
+  certbot:
+    command: >
+      certonly --webroot 
+      --webroot-path=/var/www/certbot 
+      --email ${CERTBOT_EMAIL:-admin@example.com} 
+      --agree-tos 
+      --no-eff-email 
+      ${CERTBOT_STAGING:+--staging}
+      -d ${SERVER_NAME}
