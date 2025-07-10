@@ -60,6 +60,8 @@ jobs:
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          CSRF_TRUSTED_ORIGINS: ${{ secrets.CSRF_TRUSTED_ORIGINS }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           export DEBUG="${{ secrets.DEBUG }}"
@@ -69,6 +71,8 @@ jobs:
           export DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}"
           export DATABASE_HOST="${{ secrets.DATABASE_HOST }}"
           export DATABASE_PORT="${{ secrets.DATABASE_PORT }}"
+          export ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
+          export CSRF_TRUSTED_ORIGINS="${{ secrets.CSRF_TRUSTED_ORIGINS }}"
 
           cat <<EOT > ~/dev/my-personal-website/client_management_system.env
           DEBUG=$DEBUG
@@ -78,6 +82,8 @@ jobs:
           DATABASE_PASSWORD=$DATABASE_PASSWORD
           DATABASE_HOST=$DATABASE_HOST
           DATABASE_PORT=$DATABASE_PORT
+          ALLOWED_HOSTS=$ALLOWED_HOSTS
+          CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS
           EOT
           EOF
 
