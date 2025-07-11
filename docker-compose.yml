@@ -13,7 +13,7 @@ services:
       - ./ssl:/etc/nginx/ssl
       - ./html:/usr/share/nginx/html/
       - certbot_www:/var/www/certbot
-      - certbot_conf:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - webnet
     restart: always
@@ -42,7 +42,7 @@ services:
     container_name: certbot
     volumes:
       - certbot_www:/var/www/certbot
-      - certbot_conf:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; certbot renew; done'"
     networks:
       - webnet
@@ -54,4 +54,3 @@ volumes:
   static_volume:
   media_volume:
   certbot_www:
-  certbot_conf:
