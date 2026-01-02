@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Установка Any2VPN - Инструкции по настройке Wireguard</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 50px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .platforms {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+      }
+
+      .platform-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .platform-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .platform-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .platform-icon {
+        font-size: 2.5rem;
+        margin-right: 15px;
+      }
+
+      .platform-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .steps {
+        list-style: none;
+        counter-reset: step-counter;
+      }
+
+      .step {
+        counter-increment: step-counter;
+        position: relative;
+        padding: 15px 0 15px 60px;
+        margin-bottom: 10px;
+        border-left: 3px solid #e9ecef;
+      }
+
+      .step:last-child {
+        border-left: 3px solid transparent;
+      }
+
+      .step::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: -15px;
+        top: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+      }
+
+      .step-text {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      .step-highlight {
+        background: #f8f9ff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        margin: 10px 0;
+        font-weight: 500;
+      }
+
+      .note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-weight: 500;
+      }
+
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .screenshot {
+        width: 200px;
+        height: 350px;
+        background-color: #ccc;
+        border-radius: 8px;
+        margin: 15px auto;
+        display: block;
+      }
+
+      .step-text a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s ease;
+      }
+
+      .step-text a:hover {
+        border-bottom-color: #667eea;
+      }
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .platforms {
+          grid-template-columns: 1fr;
+        }
+
+        .platform-card {
+          padding: 20px;
+        }
+
+        .download-links {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🔐 Any2VPN</h1>
+        <p class="subtitle">
+          Простая настройка Wireguard VPN на всех устройствах
+        </p>
+      </div>
+
+      <div class="platforms">
+        <!-- iOS -->
+        <div class="platform-card">
+          <div class="platform-header">
+            <div class="platform-icon">📱</div>
+            <div class="platform-title">iOS (iPhone/iPad)</div>
+          </div>
+          <ol class="steps">
+            <li class="step">
+              <div class="step-text">
+                Установите приложение <strong>WireGuard</strong> из
+                <a
+                  href="https://apps.apple.com/app/wireguard/id1441195209"
+                  target="_blank"
+                  >App Store</a
+                >
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Откройте конфигурационный файл в боте Any2VPN
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                В правом нижнем углу нажмите на <strong>иконку файла</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Затем в левом нижнем углу нажмите на
+                <strong>другую иконку</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Выберите ранее скаченное приложение <strong>WireGuard</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Нажмите <strong>"Разрешить"</strong> на добавление конфигурации
+                VPN
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Введите пароль устройства для подтверждения
+                <div class="screenshot"></div>
+              </div>
+            </li>
+          </ol>
+          <div class="success">✅ Any2VPN успешно установлен!</div>
+        </div>
+
+        <!-- Android -->
+        <div class="platform-card">
+          <div class="platform-header">
+            <div class="platform-icon">🤖</div>
+            <div class="platform-title">Android</div>
+          </div>
+          <ol class="steps">
+            <li class="step">
+              <div class="step-text">
+                Установите приложение <strong>WireGuard</strong> из
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.wireguard.android"
+                  target="_blank"
+                  >Google Play</a
+                >
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Скачайте конфигурационный файл от Any2VPN бота
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Откройте приложение WireGuard
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Нажмите кнопку <strong>"+"</strong> для добавления туннеля
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Выберите <strong>"Импортировать из файла"</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Найдите и выберите скаченный конфигурационный файл
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Активируйте VPN переключателем в приложении
+                <div class="screenshot"></div>
+              </div>
+            </li>
+          </ol>
+          <div class="success">✅ Any2VPN готов к использованию!</div>
+        </div>
+
+        <!-- macOS -->
+        <div class="platform-card">
+          <div class="platform-header">
+            <div class="platform-icon">🖥️</div>
+            <div class="platform-title">macOS</div>
+          </div>
+          <ol class="steps">
+            <li class="step">
+              <div class="step-text">
+                Скачайте и установите <strong>WireGuard</strong> с
+                <a href="https://www.wireguard.com/install/" target="_blank"
+                  >официального сайта</a
+                >
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Скачайте конфигурационный файл Any2VPN на компьютер
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Запустите приложение WireGuard
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Нажмите <strong>"Импортировать туннели из файла"</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Выберите скачанный конфигурационный файл (.conf)
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Введите пароль администратора для установки VPN профиля
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Активируйте соединение кнопкой <strong>"Активировать"</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+          </ol>
+          <div class="success">✅ Any2VPN активен на macOS!</div>
+        </div>
+
+        <!-- Windows -->
+        <div class="platform-card">
+          <div class="platform-header">
+            <div class="platform-icon">🪟</div>
+            <div class="platform-title">Windows</div>
+          </div>
+          <ol class="steps">
+            <li class="step">
+              <div class="step-text">
+                Скачайте и установите <strong>WireGuard</strong> с
+                <a href="https://www.wireguard.com/install/" target="_blank"
+                  >официального сайта</a
+                >
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Скачайте конфигурационный файл Any2VPN
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Запустите WireGuard от имени <strong>администратора</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Нажмите <strong>"Импортировать туннели из файла"</strong>
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Выберите конфигурационный файл Any2VPN (.conf)
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Подтвердите импорт конфигурации
+                <div class="screenshot"></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                Нажмите <strong>"Активировать"</strong> для запуска VPN
+                <div class="screenshot"></div>
+              </div>
+            </li>
+          </ol>
+          <div class="success">✅ Any2VPN работает на Windows!</div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>💡 Важно:</strong> После активации VPN проверьте свой IP-адрес
+        на любом сайте проверки IP. Убедитесь, что ваш реальный IP-адрес скрыт.
+      </div>
+    </div>
+  </body>
+</html>
