@@ -106,20 +106,69 @@ jobs:
             # Create ssl directory if it doesn't exist
             mkdir -p ssl
             
-            # Check if certificates already exist
-            if [ ! -f "ssl/fullchain.pem" ] || [ ! -f "ssl/privkey.pem" ]; then
-              echo "SSL certificates not found. They will be created automatically when containers start."
-              
-              # Create temporary self-signed certificates for initial startup
-              openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
-                -keyout ssl/privkey.pem \
-                -out ssl/fullchain.pem \
-                -subj "/CN=localhost"
-              
-              echo "Temporary certificates created for initial startup"
-            else
-              echo "SSL certificates already exist"
+            # Load environment variables to get SERVER_NAME
+            if [ -f "client_management_system.env" ]; then
+              export $(grep -v '^#' client_management_system.env | xargs)
             fi
+            
+            # Check if real certificates already exist
+            if [ -f "ssl/fullchain.pem" ] && [ -f "ssl/privkey.pem" ]; then
+              # Check if certificate is not self-signed
+              if openssl x509 -in ssl/fullchain.pem -text -noout | grep -q "CN = $SERVER_NAME"; then
+                echo "Valid SSL certificates already exist for $SERVER_NAME"
+                exit 0
+              fi
+            fi
+            
+            echo "Setting up SSL certificates for $SERVER_NAME..."
+            
+            # Start temporary nginx for ACME challenge
+            docker run -d --name temp-nginx-ssl -p 80:80 \
+              -v $(pwd)/ssl:/etc/nginx/ssl \
+              -v certbot_www:/var/www/certbot \
+              --network webnet \
+              nginx:latest
+            
+            # Wait for nginx to start
+            sleep 5
+            
+            # Try to get real certificate from Let's Encrypt
+            docker run --rm \
+              -v certbot_www:/var/www/certbot \
+              -v /etc/letsencrypt:/etc/letsencrypt \
+              --network webnet \
+              certbot/certbot \
+              certonly --webroot --webroot-path=/var/www/certbot \
+              --email admin@$SERVER_NAME \
+              --agree-tos \
+              --no-eff-email \
+              --non-interactive \
+              -d $SERVER_NAME \
+              -d www.$SERVER_NAME || {
+                echo "Failed to get Let's Encrypt certificate, creating temporary certificate"
+                
+                # Create temporary self-signed certificates for initial startup
+                openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+                  -keyout ssl/privkey.pem \
+                  -out ssl/fullchain.pem \
+                  -subj "/CN=localhost"
+                
+                # Clean up and exit
+                docker stop temp-nginx-ssl 2>/dev/null || true
+                docker rm temp-nginx-ssl 2>/dev/null || true
+                exit 0
+              }
+            
+            # Copy real certificates if successful
+            if [ -f "/etc/letsencrypt/live/$SERVER_NAME/fullchain.pem" ]; then
+              cp /etc/letsencrypt/live/$SERVER_NAME/fullchain.pem ./ssl/
+              cp /etc/letsencrypt/live/$SERVER_NAME/privkey.pem ./ssl/
+              echo "Real SSL certificates obtained and copied successfully!"
+            fi
+            
+            # Clean up temporary nginx
+            docker stop temp-nginx-ssl 2>/dev/null || true
+            docker rm temp-nginx-ssl 2>/dev/null || true
           EOF
 
       # Stop Nginx and Gunicorn if they are running
