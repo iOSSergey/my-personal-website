@@ -43,9 +43,12 @@ services:
     volumes:
       - certbot_www:/var/www/certbot
       - /etc/letsencrypt:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; certbot renew; done'"
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $!; certbot renew --post-hook \"docker exec nginx nginx -s reload\"; done'"
     networks:
       - webnet
+    depends_on:
+      - web
 
 networks:
   webnet:
