@@ -127,30 +127,28 @@ jobs:
             
             # Create temporary nginx config for ACME challenge only
             mkdir -p /tmp/nginx-acme
-            cat > /tmp/nginx-acme/nginx.conf << 'NGINX_CONF'
-events {
-    worker_connections 1024;
-}
-
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-
-    server {
-        listen 80;
-        server_name $SERVER_NAME www.$SERVER_NAME;
-
-        location /.well-known/acme-challenge/ {
-            root /var/www/certbot;
-        }
-
-        location / {
-            return 200 'ACME Challenge Server Running';
-            add_header Content-Type text/plain;
-        }
-    }
-}
-NGINX_CONF
+            echo "events {" > /tmp/nginx-acme/nginx.conf
+            echo "    worker_connections 1024;" >> /tmp/nginx-acme/nginx.conf
+            echo "}" >> /tmp/nginx-acme/nginx.conf
+            echo "" >> /tmp/nginx-acme/nginx.conf
+            echo "http {" >> /tmp/nginx-acme/nginx.conf
+            echo "    include       /etc/nginx/mime.types;" >> /tmp/nginx-acme/nginx.conf
+            echo "    default_type  application/octet-stream;" >> /tmp/nginx-acme/nginx.conf
+            echo "" >> /tmp/nginx-acme/nginx.conf
+            echo "    server {" >> /tmp/nginx-acme/nginx.conf
+            echo "        listen 80;" >> /tmp/nginx-acme/nginx.conf
+            echo "        server_name \$SERVER_NAME www.\$SERVER_NAME;" >> /tmp/nginx-acme/nginx.conf
+            echo "" >> /tmp/nginx-acme/nginx.conf
+            echo "        location /.well-known/acme-challenge/ {" >> /tmp/nginx-acme/nginx.conf
+            echo "            root /var/www/certbot;" >> /tmp/nginx-acme/nginx.conf
+            echo "        }" >> /tmp/nginx-acme/nginx.conf
+            echo "" >> /tmp/nginx-acme/nginx.conf
+            echo "        location / {" >> /tmp/nginx-acme/nginx.conf
+            echo "            return 200 'ACME Challenge Server Running';" >> /tmp/nginx-acme/nginx.conf
+            echo "            add_header Content-Type text/plain;" >> /tmp/nginx-acme/nginx.conf
+            echo "        }" >> /tmp/nginx-acme/nginx.conf
+            echo "    }" >> /tmp/nginx-acme/nginx.conf
+            echo "}" >> /tmp/nginx-acme/nginx.conf
 
             # Start temporary nginx for ACME challenge
             echo "Starting temporary nginx for ACME challenge..."
