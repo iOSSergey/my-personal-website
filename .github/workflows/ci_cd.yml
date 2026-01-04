@@ -127,7 +127,7 @@ jobs:
             
             # Create temporary nginx config for ACME challenge only
             mkdir -p /tmp/nginx-acme
-            cat > /tmp/nginx-acme/nginx.conf << EOT
+            cat > /tmp/nginx-acme/nginx.conf << 'NGINX_CONF'
 events {
     worker_connections 1024;
 }
@@ -150,7 +150,7 @@ http {
         }
     }
 }
-EOT
+NGINX_CONF
 
             # Start temporary nginx for ACME challenge
             echo "Starting temporary nginx for ACME challenge..."
