@@ -122,23 +122,47 @@ jobs:
             
             echo "Setting up SSL certificates for $SERVER_NAME..."
             
-            # Create temporary self-signed certificates for nginx to start
-            if [ ! -f "ssl/fullchain.pem" ] || [ ! -f "ssl/privkey.pem" ]; then
-              echo "Creating temporary certificates for nginx startup..."
-              openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
-                -keyout ssl/privkey.pem \
-                -out ssl/fullchain.pem \
-                -subj "/CN=localhost"
-            fi
+            # Stop all containers first
+            docker compose down || true
             
-            # Start containers first (nginx needs certificates to start)
-            echo "Starting containers..."
-            docker compose up -d
-            
-            # Wait for nginx to be ready
-            sleep 10
-            
-            # Try to get real certificate from Let's Encrypt using running nginx
+            # Create temporary nginx config for ACME challenge only
+            mkdir -p /tmp/nginx-acme
+            cat > /tmp/nginx-acme/nginx.conf << EOT
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    server {
+        listen 80;
+        server_name $SERVER_NAME www.$SERVER_NAME;
+
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+
+        location / {
+            return 200 'ACME Challenge Server Running';
+            add_header Content-Type text/plain;
+        }
+    }
+}
+EOT
+
+            # Start temporary nginx for ACME challenge
+            echo "Starting temporary nginx for ACME challenge..."
+            docker run -d --name temp-nginx-acme -p 80:80 \
+              -v /tmp/nginx-acme/nginx.conf:/etc/nginx/nginx.conf \
+              -v certbot_www:/var/www/certbot \
+              nginx:latest
+
+            # Wait for nginx to start
+            sleep 5
+
+            # Try to get real certificate from Let's Encrypt
             echo "Requesting real SSL certificate from Let's Encrypt..."
             docker run --rm \
               -v certbot_www:/var/www/certbot \
@@ -152,23 +176,36 @@ jobs:
               --force-renewal \
               -d $SERVER_NAME \
               -d www.$SERVER_NAME
-            
-            # Copy real certificates if successful and reload nginx
+
+            # Clean up temporary nginx
+            docker stop temp-nginx-acme 2>/dev/null || true
+            docker rm temp-nginx-acme 2>/dev/null || true
+            rm -rf /tmp/nginx-acme
+
+            # Copy certificates if successful
             if [ -f "/etc/letsencrypt/live/$SERVER_NAME/fullchain.pem" ]; then
               echo "Copying real SSL certificates..."
               cp /etc/letsencrypt/live/$SERVER_NAME/fullchain.pem ./ssl/
               cp /etc/letsencrypt/live/$SERVER_NAME/privkey.pem ./ssl/
-              
-              # Reload nginx to use new certificates
-              docker exec nginx nginx -s reload
-              echo "Real SSL certificates installed and nginx reloaded!"
+              echo "Real SSL certificates obtained successfully!"
             else
-              echo "Could not obtain Let's Encrypt certificate. Using temporary certificates."
-              echo "Please check:"
-              echo "1. DNS points to this server: nslookup $SERVER_NAME"
-              echo "2. Port 80 is accessible from internet"
-              echo "3. Domain name is correct"
+              echo "Could not obtain Let's Encrypt certificate. Creating temporary certificates."
+              # Create temporary self-signed certificates
+              openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+                -keyout ssl/privkey.pem \
+                -out ssl/fullchain.pem \
+                -subj "/CN=localhost"
+              echo "Temporary certificates created."
             fi
+            
+            # Now start the main application
+            echo "Starting main application containers..."
+            docker compose up -d
+            
+            # Wait for containers to start
+            sleep 10
+            
+            echo "SSL setup completed!"
           EOF
 
       # Stop Nginx and Gunicorn if they are running
