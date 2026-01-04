@@ -1,5 +1,9 @@
 name: CI/CD Deployment
 
+# This workflow deploys the application with automatic SSL certificate management
+# SSL certificates are managed by Let's Encrypt via certbot container
+# No manual SSL certificate management required in secrets
+
 on:
   push:
     branches:
@@ -62,6 +66,7 @@ jobs:
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           CSRF_TRUSTED_ORIGINS: ${{ secrets.CSRF_TRUSTED_ORIGINS }}
+          SERVER_NAME: ${{ secrets.SERVER_NAME }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           export DEBUG="${{ secrets.DEBUG }}"
@@ -73,6 +78,7 @@ jobs:
           export DATABASE_PORT="${{ secrets.DATABASE_PORT }}"
           export ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
           export CSRF_TRUSTED_ORIGINS="${{ secrets.CSRF_TRUSTED_ORIGINS }}"
+          export SERVER_NAME="${{ secrets.SERVER_NAME }}"
 
           cat <<EOT > ~/dev/my-personal-website/client_management_system.env
           DEBUG=$DEBUG
@@ -84,19 +90,36 @@ jobs:
           DATABASE_PORT=$DATABASE_PORT
           ALLOWED_HOSTS=$ALLOWED_HOSTS
           CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS
+          SERVER_NAME=$SERVER_NAME
           EOT
           EOF
 
-      # Set up Nginx with SSL
-      - name: Set up Nginx with SSL
+      # Initialize SSL certificates if they don't exist
+      - name: Initialize SSL Certificates
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-            mkdir -p ~/dev/my-personal-website/ssl
-            echo "${{ secrets.SSL_CERTIFICATE }}" > ~/dev/my-personal-website/ssl/fullchain.pem
-            echo "${{ secrets.SSL_CERTIFICATE_KEY }}" > ~/dev/my-personal-website/ssl/privkey.pem
+            cd ~/dev/my-personal-website
+            
+            # Create ssl directory if it doesn't exist
+            mkdir -p ssl
+            
+            # Check if certificates already exist
+            if [ ! -f "ssl/fullchain.pem" ] || [ ! -f "ssl/privkey.pem" ]; then
+              echo "SSL certificates not found. They will be created automatically when containers start."
+              
+              # Create temporary self-signed certificates for initial startup
+              openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+                -keyout ssl/privkey.pem \
+                -out ssl/fullchain.pem \
+                -subj "/CN=localhost"
+              
+              echo "Temporary certificates created for initial startup"
+            else
+              echo "SSL certificates already exist"
+            fi
           EOF
 
       # Stop Nginx and Gunicorn if they are running
@@ -129,6 +152,43 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10 $USERNAME@$SERVER << 'EOF'
           cd ~/dev/my-personal-website
+          
+          # Stop existing containers gracefully
+          docker compose down || true
+          
+          # Pull latest images
           docker compose pull
+          
+          # Build and start containers
           docker compose up --build -d
+          
+          # Wait for containers to start
+          sleep 10
+          
+          # Check if containers are running
+          docker compose ps
+          
+          echo "Deployment completed successfully!"
+          EOF
+
+      # Health check
+      - name: Health Check
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          SERVER: ${{ secrets.SERVER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          cd ~/dev/my-personal-website
+          
+          # Wait a bit more for services to fully start
+          sleep 5
+          
+          # Check if all containers are running
+          if [ "$(docker compose ps --services --filter 'status=running' | wc -l)" -eq "$(docker compose ps --services | wc -l)" ]; then
+            echo "✅ All containers are running successfully"
+          else
+            echo "❌ Some containers failed to start"
+            docker compose logs --tail=20
+            exit 1
+          fi
           EOF
