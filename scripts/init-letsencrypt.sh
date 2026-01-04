@@ -56,11 +56,11 @@ docker run --rm \
     -v /etc/letsencrypt:/etc/letsencrypt \
     certbot/certbot \
     certonly --webroot --webroot-path=/var/www/certbot \
-    --email admin@iossergey.online \
+    --email admin@$SERVER_NAME \
     --agree-tos \
     --no-eff-email \
-    -d iossergey.online \
-    -d www.iossergey.online
+    -d $SERVER_NAME \
+    -d www.$SERVER_NAME
 
 # Stop temporary nginx
 docker stop nginx-temp

@@ -10,13 +10,13 @@ Welcome to my personal website repository! This project contains the code and as
 
 ## SSL Certificate Management
 
-This project uses Let's Encrypt for automatic SSL certificate management for **iossergey.online**.
+This project uses Let's Encrypt for automatic SSL certificate management.
 
 ### Initial Setup
 
-1. Set your `SERVER_NAME=iossergey.online` in `client_management_system.env`
+1. Set your `SERVER_NAME=your-domain.com` in `client_management_system.env`
 2. Run initial certificate creation: `./scripts/init-letsencrypt.sh`
-3. Certificates will be created for both `iossergey.online` and `www.iossergey.online`
+3. Certificates will be created for your domain and www subdomain
 
 ### Automatic Renewal
 
