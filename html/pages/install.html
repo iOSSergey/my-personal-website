@@ -8,10 +8,14 @@
     <!-- Open Graph meta tags -->
 
     <meta property="og:title" content="Как установить Any2VPN" />
-    <meta property="og:description" content="Простая настройка Wireguard VPN на всех устройствах" />
+    <meta
+      property="og:description"
+      content="Простая настройка Wireguard VPN на всех устройствах"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Инструкция на сайте" />
-    <meta property="og:image" content="/assets/images/og-preview.png" />A
+    <meta property="og:image" content="/assets/images/og-preview.png" />
+    A
 
     <style>
       * {
@@ -163,12 +167,13 @@
       }
 
       .screenshot {
-        width: 200px;
-        height: 350px;
-        background-color: #ccc;
+        max-width: 100%;
+        width: 375px;
+        height: auto;
         border-radius: 8px;
         margin: 15px auto;
         display: block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .step-text a {
@@ -228,7 +233,7 @@
                   >App Store</a
                 >
                 <img
-                  src="/assets/images/screenshots/wireguard/ios/01-install-app.jpeg"
+                  src="/assets/screenshots/wireguard/ios/01-install-app.png"
                   alt="WireGuard App Store"
                   class="screenshot"
                 />
@@ -237,39 +242,80 @@
             <li class="step">
               <div class="step-text">
                 Откройте конфигурационный файл в боте Any2VPN
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/02-open-config-file.png"
+                  alt="Открыть конфигурационный файл"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 В правом нижнем углу нажмите на <strong>иконку файла</strong>
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/03-tap-file-icon.png"
+                  alt="Нажать на иконку файла"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Затем в левом нижнем углу нажмите на
                 <strong>другую иконку</strong>
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/04-tap-share-icon.png"
+                  alt="Нажать на иконку экспорта"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Выберите ранее скаченное приложение <strong>WireGuard</strong>
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/05-select-wireguard.png"
+                  alt="Выбрать WireGuard"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Нажмите <strong>"Разрешить"</strong> на добавление конфигурации
                 VPN
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/06-allow-vpn-config.png"
+                  alt="Разрешить добавление VPN"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Введите пароль устройства для подтверждения
-                <div class="screenshot"></div>
+                <img
+                  src="/assets/screenshots/wireguard/ios/07-enter-password.png"
+                  alt="Ввести пароль"
+                  class="screenshot"
+                  loading="lazy"
+                />
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-text">
+                VPN успешно установлен и готов к использованию
+                <img
+                  src="/assets/screenshots/wireguard/ios/08-vpn-connected.png"
+                  alt="VPN подключен"
+                  class="screenshot"
+                  loading="lazy"
+                />
               </div>
             </li>
           </ol>
