@@ -25,7 +25,7 @@
 
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, sans-serif;
+          sans-serif;
         line-height: 1.6;
         color: #333;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -53,7 +53,6 @@
       .header .subtitle {
         font-size: 1.2rem;
         opacity: 0.9;
-        font-weight: 300;
       }
 
       .platforms {
@@ -68,7 +67,7 @@
         border-radius: 15px;
         padding: 30px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.3s, box-shadow 0.3s;
       }
 
       .platform-card:hover {
@@ -103,16 +102,19 @@
       .step {
         counter-increment: step-counter;
         position: relative;
-        padding: 15px 0 15px 35px;
-        margin-bottom: 0;
+        padding: 0 0 15px 25px;
         border-left: 3px solid #e9ecef;
+      }
+
+      .step:last-child {
+        padding-bottom: 30px;
       }
 
       .step::before {
         content: counter(step-counter);
         position: absolute;
         left: -15px;
-        top: 15px;
+        top: 0;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         width: 30px;
@@ -126,17 +128,11 @@
         box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
       }
 
-      .step-text {
-        font-size: 1rem;
-        line-height: 1.5;
-      }
-
-      .step-highlight {
-        background: #f8f9ff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-        margin: 10px 0;
+      .note,
+      .success {
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
         font-weight: 500;
       }
 
@@ -144,20 +140,12 @@
         background: #fff3cd;
         border: 1px solid #ffeaa7;
         color: #856404;
-        padding: 20px;
-        border-radius: 10px;
-        margin: 20px 0;
-        font-weight: 500;
       }
 
       .success {
         background: #d4edda;
         border: 1px solid #c3e6cb;
         color: #155724;
-        padding: 20px;
-        border-radius: 10px;
-        margin: 20px 0;
-        font-weight: 500;
         text-align: center;
       }
 
@@ -176,12 +164,13 @@
         text-decoration: none;
         font-weight: 600;
         border-bottom: 1px solid transparent;
-        transition: border-color 0.3s ease;
+        transition: border-color 0.3s;
       }
 
       .step-text a:hover {
         border-bottom-color: #667eea;
       }
+
       @media (max-width: 768px) {
         .header h1 {
           font-size: 2rem;
@@ -193,11 +182,6 @@
 
         .platform-card {
           padding: 20px;
-        }
-
-        .download-links {
-          flex-direction: column;
-          align-items: center;
         }
       }
     </style>
