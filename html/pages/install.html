@@ -48,6 +48,10 @@
         font-size: 3rem;
         margin-bottom: 10px;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
       }
 
       .header .subtitle {
@@ -78,6 +82,7 @@
       .platform-header {
         display: flex;
         align-items: center;
+        gap: 15px;
         margin-bottom: 25px;
         padding-bottom: 15px;
         border-bottom: 2px solid #f0f0f0;
@@ -85,13 +90,16 @@
 
       .platform-icon {
         font-size: 2.5rem;
-        margin-right: 15px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
       }
 
       .platform-title {
         font-size: 1.5rem;
         font-weight: 600;
         color: #2c3e50;
+        line-height: 1.2;
       }
 
       .steps {
@@ -107,14 +115,14 @@
       }
 
       .step:last-child {
-        padding-bottom: 30px;
+        padding-bottom: 0;
       }
 
       .step::before {
         content: counter(step-counter);
         position: absolute;
         left: -15px;
-        top: 0;
+        top: 2px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         width: 30px;
@@ -154,9 +162,43 @@
         width: 300px;
         height: auto;
         border-radius: 8px;
-        margin: 15px auto;
+        margin: 20px auto 15px;
         display: block;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .screenshot-placeholder {
+        max-width: 100%;
+        width: 300px;
+        height: 200px;
+        border-radius: 8px;
+        margin: 20px auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border: 2px dashed #a8b3c1;
+        color: #6b7280;
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .screenshot-placeholder-mobile {
+        max-width: 100%;
+        width: 300px;
+        height: 450px;
+        border-radius: 8px;
+        margin: 20px auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border: 2px dashed #a8b3c1;
+        color: #6b7280;
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 20px;
       }
 
       .step-text a {
@@ -316,43 +358,57 @@
                   target="_blank"
                   >Google Play</a
                 >
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Скачайте конфигурационный файл от Any2VPN бота
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Откройте приложение WireGuard
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Нажмите кнопку <strong>"+"</strong> для добавления туннеля
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Выберите <strong>"Импортировать из файла"</strong>
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Найдите и выберите скаченный конфигурационный файл
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Активируйте VPN переключателем в приложении
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder-mobile">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
           </ol>
@@ -372,43 +428,57 @@
                 <a href="https://www.wireguard.com/install/" target="_blank"
                   >официального сайта</a
                 >
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Скачайте конфигурационный файл Any2VPN на компьютер
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Запустите приложение WireGuard
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Нажмите <strong>"Импортировать туннели из файла"</strong>
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Выберите скачанный конфигурационный файл (.conf)
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Введите пароль администратора для установки VPN профиля
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Активируйте соединение кнопкой <strong>"Активировать"</strong>
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
           </ol>
@@ -428,43 +498,57 @@
                 <a href="https://www.wireguard.com/install/" target="_blank"
                   >официального сайта</a
                 >
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Скачайте конфигурационный файл Any2VPN
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Запустите WireGuard от имени <strong>администратора</strong>
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Нажмите <strong>"Импортировать туннели из файла"</strong>
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Выберите конфигурационный файл Any2VPN (.conf)
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Подтвердите импорт конфигурации
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
             <li class="step">
               <div class="step-text">
                 Нажмите <strong>"Активировать"</strong> для запуска VPN
-                <div class="screenshot"></div>
+                <div class="screenshot-placeholder">
+                  📸 Скриншот скоро появится
+                </div>
               </div>
             </li>
           </ol>
