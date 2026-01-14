@@ -226,10 +226,85 @@
           padding: 20px;
         }
       }
+
+      .platform-menu {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .menu-toggle {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+      }
+
+      .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu-overlay.active {
+        display: flex;
+      }
+
+      .menu-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        min-width: 260px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .menu-title {
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+
+      .menu-card a {
+        display: block;
+        padding: 12px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 8px;
+        background: #f3f4f6;
+        transition: background 0.2s, transform 0.2s;
+      }
+
+      .menu-card a:hover {
+        background: #e0e7ff;
+        transform: translateY(-2px);
+      }
     </style>
   </head>
   <body>
     <div class="container">
+      <div class="platform-menu">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <div class="menu-overlay" id="menuOverlay">
+          <div class="menu-card">
+            <div class="menu-title">Выберите платформу</div>
+            <a href="#ios">📱 iOS</a>
+            <a href="#android">🤖 Android</a>
+            <a href="#macos">🖥 macOS</a>
+            <a href="#windows">🪟 Windows</a>
+          </div>
+        </div>
+      </div>
       <div class="header">
         <h1>🔐 Any2VPN</h1>
         <p class="subtitle">
@@ -239,7 +314,7 @@
 
       <div class="platforms">
         <!-- iOS -->
-        <div class="platform-card">
+        <div class="platform-card" id="ios">
           <div class="platform-header">
             <div class="platform-icon">📱</div>
             <div class="platform-title">iOS (iPhone/iPad)</div>
@@ -344,7 +419,7 @@
         </div>
 
         <!-- Android -->
-        <div class="platform-card">
+        <div class="platform-card" id="android">
           <div class="platform-header">
             <div class="platform-icon">🤖</div>
             <div class="platform-title">Android</div>
@@ -444,7 +519,7 @@
         </div>
 
         <!-- macOS -->
-        <div class="platform-card">
+        <div class="platform-card" id="macos">
           <div class="platform-header">
             <div class="platform-icon">🖥️</div>
             <div class="platform-title">macOS</div>
@@ -542,7 +617,7 @@
         </div>
 
         <!-- Windows -->
-        <div class="platform-card">
+        <div class="platform-card" id="windows">
           <div class="platform-header">
             <div class="platform-icon">🪟</div>
             <div class="platform-title">Windows</div>
@@ -642,5 +717,25 @@
         на любом сайте проверки IP. Убедитесь, что ваш реальный IP-адрес скрыт.
       </div>
     </div>
+    <script>
+      const toggle = document.getElementById("menuToggle");
+      const overlay = document.getElementById("menuOverlay");
+
+      toggle.addEventListener("click", () => {
+        overlay.classList.toggle("active");
+      });
+
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove("active");
+        }
+      });
+
+      document.querySelectorAll(".menu-card a").forEach(link => {
+        link.addEventListener("click", () => {
+          overlay.classList.remove("active");
+        });
+      });
+    </script>
   </body>
 </html>
