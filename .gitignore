@@ -10,5 +10,3 @@ node_modules/
 # Ignore SSL certificates directory
 ssl
 
-# Ignore Files directory
-html/files
