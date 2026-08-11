@@ -1,5 +1,7 @@
 services:
   web:
+    profiles:
+      - web
     build: .
     container_name: nginx
     env_file:
@@ -38,6 +40,8 @@ services:
       - webnet
 
   certbot:
+    profiles:
+      - certbot
     image: certbot/certbot:latest
     container_name: certbot
     volumes:
