@@ -1,7 +1,5 @@
 services:
   web:
-    profiles:
-      - web
     build: .
     container_name: nginx
     env_file:
@@ -21,6 +19,8 @@ services:
     restart: always
 
   cms:
+    profiles:
+      - cms
     image: iossergey/client_management_system:latest
     mem_limit: 100m
     memswap_limit: 150m
