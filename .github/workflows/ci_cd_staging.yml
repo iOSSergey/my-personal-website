@@ -8,16 +8,18 @@ on:
 jobs:
   deploy:
     name: Deploy to Staging Server
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       # Checkout the repository
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       # Set up SSH key
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -27,7 +29,12 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER 'mkdir -p ~/staging/my-personal-website'
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          set -e
+          mkdir -p ~/staging/my-personal-website
+          sudo apt-get update
+          sudo apt-get install -y rsync
+          EOF
 
       # Copy files to server
       - name: Deploy to Server
@@ -96,8 +103,19 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          sudo systemctl stop nginx
-          sudo systemctl stop gunicorn
+          if systemctl is-active --quiet nginx
+          then
+              sudo systemctl stop nginx
+          else
+              echo "Nginx is not running"
+          fi
+
+          if systemctl is-active --quiet gunicorn
+          then
+              sudo systemctl stop gunicorn
+          else
+              echo "Gunicorn is not running"
+          fi
           EOF
 
       # Update and restart Docker Compose
@@ -108,8 +126,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           cd ~/staging/my-personal-website
-          mkdir -p /var/www/staging/html
+          sudo mkdir -p /var/www/staging/html
           # docker compose pull
           # docker compose up --build -d
-          docker container cp html nginx:/var/www/staging/
+          sudo docker container cp html nginx:/var/www/staging/
           EOF
