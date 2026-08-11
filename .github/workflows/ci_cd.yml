@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  DEPLOY_DOMAIN: sergey.devops-team.pl
+
 jobs:
   deploy:
     name: Deploy to Server
@@ -126,9 +129,16 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+            DEPLOY_DOMAIN="${{ env.DEPLOY_DOMAIN }}"
             mkdir -p ~/dev/my-personal-website/ssl
-            echo "${{ secrets.SSL_CERTIFICATE }}" > ~/dev/my-personal-website/ssl/fullchain.pem
-            echo "${{ secrets.SSL_CERTIFICATE_KEY }}" > ~/dev/my-personal-website/ssl/privkey.pem
+
+            if [ -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/fullchain.pem" ] && [ -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/privkey.pem" ]; then
+              ln -sfn "/etc/letsencrypt/live/$DEPLOY_DOMAIN/fullchain.pem" ~/dev/my-personal-website/ssl/fullchain.pem
+              ln -sfn "/etc/letsencrypt/live/$DEPLOY_DOMAIN/privkey.pem" ~/dev/my-personal-website/ssl/privkey.pem
+            else
+              echo "${{ secrets.SSL_CERTIFICATE }}" > ~/dev/my-personal-website/ssl/fullchain.pem
+              echo "${{ secrets.SSL_CERTIFICATE_KEY }}" > ~/dev/my-personal-website/ssl/privkey.pem
+            fi
           EOF
 
       # Stop Nginx and Gunicorn if they are running
