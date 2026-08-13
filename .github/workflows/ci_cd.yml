@@ -7,6 +7,9 @@ on:
 
 env:
   DEPLOY_DOMAIN: sergey.devops-team.pl
+  SITE_NAME: my-personal-website
+  WEB_ROOT: /var/www/my-personal-website
+  ACME_ROOT: /var/www/certbot
 
 jobs:
   deploy:
@@ -16,25 +19,14 @@ jobs:
       contents: read
 
     steps:
-      # Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      # Set up SSH key
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Ensure the target directory exists
-      - name: Ensure target directory exists
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          SERVER: ${{ secrets.SERVER }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p ~/dev/my-personal-website"
-
-      # Prepare a fresh Debian 12 server for deployment
       - name: Prepare Debian 12 server
         env:
           USERNAME: ${{ secrets.USERNAME }}
@@ -42,6 +34,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
           set -e
+
+          SITE_NAME="${{ env.SITE_NAME }}"
+          WEB_ROOT="${{ env.WEB_ROOT }}"
+          ACME_ROOT="${{ env.ACME_ROOT }}"
 
           if [ -r /etc/os-release ]; then
             . /etc/os-release
@@ -53,124 +49,93 @@ jobs:
           fi
 
           sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg rsync
+          sudo apt-get install -y ca-certificates rsync nginx certbot
 
-          if ! command -v docker >/dev/null 2>&1 || ! sudo docker compose version >/dev/null 2>&1; then
-            sudo install -m 0755 -d /etc/apt/keyrings
+          sudo install -d -m 0755 "$WEB_ROOT" "$ACME_ROOT"
+          sudo systemctl enable nginx
 
-            if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
-              curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-              sudo chmod a+r /etc/apt/keyrings/docker.gpg
+          if command -v docker >/dev/null 2>&1; then
+            if [ -d "$HOME/dev/$SITE_NAME" ]; then
+              cd "$HOME/dev/$SITE_NAME"
+              sudo docker compose down || true
             fi
 
-            . /etc/os-release
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-
-            sudo apt-get update
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-            sudo systemctl enable --now docker
+            sudo docker stop nginx cms certbot 2>/dev/null || true
           fi
           EOF
 
-      # Copy files to server
-      - name: Deploy to Server
+      - name: Deploy static files
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
           rsync -avz --delete \
-            --exclude='.git' --exclude='.git/*' \
+            --exclude='.DS_Store' \
+            --rsync-path="sudo rsync" \
             -e "ssh -o StrictHostKeyChecking=no" \
-            ./ $USERNAME@$SERVER:~/dev/my-personal-website
+            ./html/ $USERNAME@$SERVER:${{ env.WEB_ROOT }}/
 
-      # Create .env file on the server using export
-      - name: Create .env file
+      - name: Install Nginx bootstrap config
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
-          DEBUG: ${{ secrets.DEBUG }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-          CSRF_TRUSTED_ORIGINS: ${{ secrets.CSRF_TRUSTED_ORIGINS }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          export DEBUG="${{ secrets.DEBUG }}"
-          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
-          export DATABASE_NAME="${{ secrets.DATABASE_NAME }}"
-          export DATABASE_USER="${{ secrets.DATABASE_USER }}"
-          export DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}"
-          export DATABASE_HOST="${{ secrets.DATABASE_HOST }}"
-          export DATABASE_PORT="${{ secrets.DATABASE_PORT }}"
-          export ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
-          export CSRF_TRUSTED_ORIGINS="${{ secrets.CSRF_TRUSTED_ORIGINS }}"
+          scp -o StrictHostKeyChecking=no config/nginx/native-http.conf $USERNAME@$SERVER:/tmp/${{ env.SITE_NAME }}.conf
 
-          cat <<EOT > ~/dev/my-personal-website/client_management_system.env
-          DEBUG=$DEBUG
-          SECRET_KEY=$SECRET_KEY
-          DATABASE_NAME=$DATABASE_NAME
-          DATABASE_USER=$DATABASE_USER
-          DATABASE_PASSWORD=$DATABASE_PASSWORD
-          DATABASE_HOST=$DATABASE_HOST
-          DATABASE_PORT=$DATABASE_PORT
-          ALLOWED_HOSTS=$ALLOWED_HOSTS
-          CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS
-          EOT
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          set -e
+
+          SITE_NAME="${{ env.SITE_NAME }}"
+
+          sudo install -m 0644 "/tmp/$SITE_NAME.conf" "/etc/nginx/sites-available/$SITE_NAME"
+          sudo ln -sfn "/etc/nginx/sites-available/$SITE_NAME" "/etc/nginx/sites-enabled/$SITE_NAME"
+          sudo rm -f /etc/nginx/sites-enabled/default
+
+          sudo nginx -t
+          sudo systemctl restart nginx
           EOF
 
-      # Set up Nginx with SSL
-      - name: Set up Nginx with SSL
+      - name: Ensure Let's Encrypt certificate
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-            DEPLOY_DOMAIN="${{ env.DEPLOY_DOMAIN }}"
-            mkdir -p ~/dev/my-personal-website/ssl
+          set -e
 
-            if [ -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/fullchain.pem" ] && [ -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/privkey.pem" ]; then
-              ln -sfn "/etc/letsencrypt/live/$DEPLOY_DOMAIN/fullchain.pem" ~/dev/my-personal-website/ssl/fullchain.pem
-              ln -sfn "/etc/letsencrypt/live/$DEPLOY_DOMAIN/privkey.pem" ~/dev/my-personal-website/ssl/privkey.pem
-            else
-              echo "${{ secrets.SSL_CERTIFICATE }}" > ~/dev/my-personal-website/ssl/fullchain.pem
-              echo "${{ secrets.SSL_CERTIFICATE_KEY }}" > ~/dev/my-personal-website/ssl/privkey.pem
-            fi
+          DEPLOY_DOMAIN="${{ env.DEPLOY_DOMAIN }}"
+          ACME_ROOT="${{ env.ACME_ROOT }}"
+
+          if [ ! -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/fullchain.pem" ] || [ ! -f "/etc/letsencrypt/live/$DEPLOY_DOMAIN/privkey.pem" ]; then
+            sudo certbot certonly \
+              --webroot \
+              -w "$ACME_ROOT" \
+              --non-interactive \
+              --agree-tos \
+              --register-unsafely-without-email \
+              -d "$DEPLOY_DOMAIN"
+          fi
+
+          sudo install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
+          printf '%s\n' \
+            '#!/bin/sh' \
+            'systemctl reload nginx' | sudo tee /etc/letsencrypt/renewal-hooks/deploy/reload-nginx >/dev/null
+          sudo chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
           EOF
 
-      # Stop Nginx and Gunicorn if they are running
-      - name: Stop Nginx and Gunicorn
+      - name: Install Nginx HTTPS config
         env:
           USERNAME: ${{ secrets.USERNAME }}
           SERVER: ${{ secrets.SERVER }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} << 'EOF'
-          if systemctl is-active --quiet nginx
-          then
-              sudo systemctl stop nginx
-          else
-              echo "Nginx is not running"
-          fi
+          scp -o StrictHostKeyChecking=no config/nginx/native-site.conf $USERNAME@$SERVER:/tmp/${{ env.SITE_NAME }}.conf
 
-          if systemctl is-active --quiet gunicorn
-          then
-              sudo systemctl stop gunicorn
-          else
-              echo "Gunicorn is not running"
-          fi
-          EOF
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+          set -e
 
-      # Update and restart Docker Compose
-      - name: Update and Restart Docker Compose
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          SERVER: ${{ secrets.SERVER }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10 $USERNAME@$SERVER << 'EOF'
-          cd ~/dev/my-personal-website
-          sudo docker compose stop cms certbot || true
-          sudo docker compose up --build -d web
+          SITE_NAME="${{ env.SITE_NAME }}"
+
+          sudo install -m 0644 "/tmp/$SITE_NAME.conf" "/etc/nginx/sites-available/$SITE_NAME"
+          sudo nginx -t
+          sudo systemctl reload nginx
           EOF
